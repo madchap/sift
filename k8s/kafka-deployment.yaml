@@ -36,7 +36,7 @@ kind: Deployment
 metadata:
   name: kafka-deployment
 spec:
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -47,19 +47,15 @@ spec:
           emptyDir: {}
         - name: kafka-logs-vol
           emptyDir: {}
-#        - name: nobrokerid-kafka
-#          configMap:
-#            name: nobrokerid-kafka-configmap
-#            items:
-#            - key: 
+        - name: nobrokerid-kafka-configmap
+          configMap:
+            name: nobrokerid-kafka
       containers:
       - name: kafka
         image: ches/kafka:0.10.1.0
         env:
           - name: ZOOKEEPER_CONNECTION_STRING
             value: $(ZK_SVC_SERVICE_HOST):$(ZK_SVC_SERVICE_PORT)
-#          - name: KAFKA_BROKER_ID
-#            value: ""
         ports:
         - containerPort: 9092
         - containerPort: 7203
@@ -68,8 +64,8 @@ spec:
             name: kafka-data-vol
           - mountPath: /logs
             name: kafka-logs-vol
-#          - mountPath: /kafka/config
-#            name: nobrokerid-kafka
+          - mountPath: /kafka/config
+            name: nobrokerid-kafka-configmap
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
